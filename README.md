@@ -92,6 +92,22 @@ extract >> transform >> load
 
 Each task communicates via Airflow's XCom mechanism so no intermediate files are needed.
 
+## Querying the weather data
+
+After the DAG has run at least once, you can check the stored data directly:
+
+```bash
+winpty docker exec -it airflow-etl-airflow-scheduler-1 sqlite3 //opt//airflow//data//weather.db "SELECT * FROM weather;"
+```
+
+Example output:
+```
+1|Munich|2026-03-20T20:24:08|5|4|70|Clear|5|11|0
+2|Munich|2026-03-20T21:24:08|6|5|68|Partly Cloudy|7|11|0
+```
+
+Columns: `id | city | timestamp | temp_c | feels_like_c | humidity | weather_desc | wind_speed_kmph | max_temp_c | min_temp_c`
+
 ## Stopping Airflow
 
 ```bash
