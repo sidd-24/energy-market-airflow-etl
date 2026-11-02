@@ -1,0 +1,14 @@
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+
+# Pipeline output: the database and downloaded SMARD files are created at runtime
+data/*.db
+data/raw/
+data/staging/
+
+# Airflow runtime folders created by docker compose
+logs/
+plugins/
