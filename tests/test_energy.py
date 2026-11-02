@@ -168,5 +168,9 @@ def test_dags_load_without_errors():
     bag = DagBag(dag_folder=str(Path(__file__).parent.parent / "dags"), include_examples=False)
     assert bag.import_errors == {}
     assert set(bag.dag_ids) == {"energy_market_etl", "energy_price_outlook"}
-    assert [t.task_id for t in bag.get_dag("energy_market_etl").topological_sort()] == \
-        ["wait_for_data", "extract", "transform", "load"]
+    etl = bag.dags["energy_market_etl"]   # get_dag() would query the metadata database
+    upstream = {t.task_id: t.upstream_task_ids for t in etl.tasks}
+    # Nothing may be extracted before the sensor has seen a complete day
+    assert upstream == {"wait_for_data": set(), "extract": {"wait_for_data"},
+                        "transform": {"extract"}, "load": {"transform"}}
+    assert bag.dags["energy_price_outlook"].get_task("recommend").upstream_task_ids == {"wait_for_prices"}

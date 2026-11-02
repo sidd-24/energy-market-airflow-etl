@@ -68,7 +68,11 @@ def energy_market_etl():
         print(f"Loaded {summary['hours']} hours, average price {summary['avg_price']} EUR/MWh")
         return summary
 
-    wait_for_data() >> load(transform(extract()))
+    # The sensor must gate extract. `wait_for_data() >> load(transform(extract()))`
+    # would only link it to load, and extract would start before the data is complete.
+    extracted = extract()
+    wait_for_data() >> extracted
+    load(transform(extracted))
 
 
 energy_market_etl()
